@@ -674,8 +674,11 @@
     [self.otherDB.fmdbQueue inDatabase:^(FMDatabase *db) {
         reader = [_encryptedBlobStore blobForKey:_encryptedBlobStoreWriter.blobKey withDatabase:db];
     }];
-
-    XCTAssertEqualObjects(self.plainData, [reader dataWithError:nil],
+    
+    NSError *error;
+    NSData *data = [reader dataWithError:&error];
+    XCTAssertNotNil(error, @"Error should not be nil");
+    XCTAssertEqualObjects(self.plainData, data,
                           @"It has to return the same data previously saved");
 }
 
