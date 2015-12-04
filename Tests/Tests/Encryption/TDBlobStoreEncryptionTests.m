@@ -25,6 +25,8 @@
 #import "TDMisc.h"
 #import "CDTMisc.h"
 
+#import "CDTLogging.h"
+
 #define TDBLOBSTOREENCRYPTIONTESTS_DBFILENAME @"schema100_1Bonsai_2Lorem.touchdb"
 #define TDBLOBSTOREENCRYPTIONTESTS_LOREM_FILE @"lorem.txt"
 #define TDBLOBSTOREENCRYPTIONTESTS_LOREM_SHA1DIGEST @"3ff2989bccf52150bba806bae1db2e0b06ad6f88"
@@ -59,6 +61,16 @@
 - (void)setUp
 {
     [super setUp];
+    [DDLog addLogger:[DDTTYLogger sharedInstance]];
+    CDTChangeLogLevel(10, DDLogLevelAll);
+    CDTChangeLogLevel(11, DDLogLevelAll);
+    CDTChangeLogLevel(12, DDLogLevelAll);
+    CDTChangeLogLevel(13, DDLogLevelAll);
+    CDTChangeLogLevel(14, DDLogLevelAll);
+    CDTChangeLogLevel(15, DDLogLevelAll);
+    CDTChangeLogLevel(16, DDLogLevelAll);
+    CDTChangeLogLevel(17, DDLogLevelAll);
+
 
     // Put setup code here. This method is called before the invocation of each test method in the
     // class.
