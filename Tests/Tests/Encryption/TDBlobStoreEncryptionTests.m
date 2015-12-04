@@ -101,12 +101,17 @@
 
     self.encryptedBlobStorePath = [NSTemporaryDirectory()
         stringByAppendingPathComponent:@"blobStoreEncryptionTests_encryptedData"];
+    NSError *error;
     self.encryptedBlobStore = [[TDBlobStore alloc] initWithPath:self.encryptedBlobStorePath
                                           encryptionKeyProvider:provider
-                                                          error:nil];
+                                                          error:&error];
+    XCTAssertNil(error, @"Error should be nil, was %@", error);
+    XCTAssertNotNil(self.encryptedBlobStore, @"blob store should not be nil");
     self.encryptedBlobStoreWriter =
         [[TDBlobStoreWriter alloc] initWithStore:self.encryptedBlobStore];
+    XCTAssertNotNil(self.encryptedBlobStoreWriter, @"blob store writer should not be nil");
 
+    
     // Test data
     self.plainData = [@"摇;摃:§婘栰" dataUsingEncoding:NSUTF8StringEncoding];
     self.hexExpectedSHA1Digest = @"0cb5ad21ca38f03ccc1139223019af3623394976";
@@ -674,6 +679,10 @@
     [self.otherDB.fmdbQueue inDatabase:^(FMDatabase *db) {
         reader = [_encryptedBlobStore blobForKey:_encryptedBlobStoreWriter.blobKey withDatabase:db];
     }];
+
+    XCTAssertNotNil(_encryptedBlobStoreWriter, @"_encryptedBlobStoreWriter should not be nil");
+    XCTAssertNotNil(_encryptedBlobStore, @"_encryptedBlobStore should not be nil");
+
     
     NSError *error;
     XCTAssertNotNil(reader, @"Reader should not be nil, but was %@", reader);
