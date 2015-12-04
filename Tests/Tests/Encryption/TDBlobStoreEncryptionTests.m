@@ -677,7 +677,9 @@
     
     NSError *error;
     NSData *data = [reader dataWithError:&error];
-    XCTAssertNotNil(error, @"Error should not be nil, but was %@", error);
+    
+    XCTAssertNil(error, @"Error should not be nil, but was %@", error);
+    NSLog(@"Data was %@", data);
     XCTAssertEqualObjects(self.plainData, data,
                           @"It has to return the same data previously saved");
 }
