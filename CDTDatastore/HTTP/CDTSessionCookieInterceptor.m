@@ -48,6 +48,9 @@ static const NSInteger CDTSessionCookieRequestTimeout = 600;
         // The _session endpoint requires a form-encoded username/password combination.
         // We might as well set that up now.
         config.HTTPAdditionalHeaders = @{ @"Content-Type" : @"application/x-www-form-urlencoded" };
+        [config setTimeoutIntervalForRequest:300];
+        [config setTimeoutIntervalForResource:300];
+
         _sessionRequestBody =
             [[NSString stringWithFormat:@"name=%@&password=%@", username, password]
                 dataUsingEncoding:NSUTF8StringEncoding];
