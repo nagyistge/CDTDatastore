@@ -83,6 +83,7 @@ static dispatch_semaphore_t g_asyncTaskMonitor;
         config = [NSURLSessionConfiguration backgroundSessionConfiguration:sessionId];
 #endif
         [config setTimeoutIntervalForRequest:300];
+        [config setTimeoutIntervalForResource:300];
         [sessionConfigDelegate customiseNSURLSessionConfiguration:config];
 
         _session = [NSURLSession sessionWithConfiguration:config
