@@ -220,16 +220,16 @@
             [self.delegate performSelector:@selector(requestDidError:)
                                   onThread:thread
                                 withObject:self.requestError
-                             waitUntilDone:YES];
+                             waitUntilDone:NO];
         } else {
             [self.delegate performSelector:@selector(receivedResponse:)
                                   onThread:thread
                                 withObject:self.response
-                             waitUntilDone:YES];
+                             waitUntilDone:NO];
             [self.delegate performSelector:@selector(receivedData:)
                                   onThread:thread
                                 withObject:self.requestData
-                             waitUntilDone:YES];
+                             waitUntilDone:NO];
         }
         self.finished = YES;
     }

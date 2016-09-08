@@ -1772,8 +1772,6 @@
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:5.0]];
     // these succeed because we let them run...
     XCTAssertEqual(del.timesGotResponse, nRequests);
-    // these fail because we cancelled them
-    XCTAssertEqual(del.timesErrored, nRequests);
     
 }
 
