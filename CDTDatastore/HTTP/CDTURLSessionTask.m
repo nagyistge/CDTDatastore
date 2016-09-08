@@ -111,6 +111,9 @@
     NSURLSessionTask *t = self.inProgressTask;
     // Check finished as we use that to guard against returning the
     // NSURLSessionTask's state if we're about to retry the request.
+    if (!self.finished && t.state == NSURLSessionTaskStateCompleted) {
+        NSLog(@"Inconsistent state");
+    }
     if (self.finished && t) {
         return t.state;
     } else {
@@ -217,16 +220,16 @@
             [self.delegate performSelector:@selector(requestDidError:)
                                   onThread:thread
                                 withObject:self.requestError
-                             waitUntilDone:NO];
+                             waitUntilDone:YES];
         } else {
             [self.delegate performSelector:@selector(receivedResponse:)
                                   onThread:thread
                                 withObject:self.response
-                             waitUntilDone:NO];
+                             waitUntilDone:YES];
             [self.delegate performSelector:@selector(receivedData:)
                                   onThread:thread
                                 withObject:self.requestData
-                             waitUntilDone:NO];
+                             waitUntilDone:YES];
         }
         self.finished = YES;
     }

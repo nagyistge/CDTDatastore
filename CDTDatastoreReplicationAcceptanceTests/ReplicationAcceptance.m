@@ -61,6 +61,7 @@
 
 @interface MyTestDelegate : NSObject<CDTURLSessionTaskDelegate>
 @property (nonatomic) int timesGotResponse;
+@property (nonatomic) int timesErrored;
 @end
 
 /**
@@ -101,22 +102,26 @@
     
     if (self) {
         _timesGotResponse = 0;
+        _timesErrored = 0;
     }
     return self;
 }
 
 - (void)receivedData:(nullable NSData *)data
 {
-    NSLog(@"receivedData %@", data);
+    //NSLog(@"receivedData %@", data);
 }
 - (void)receivedResponse:(nullable NSURLResponse *)response
 {
-    NSLog(@"receivedResponse %@", response);
-    _timesGotResponse++;
+    //NSLog(@"receivedResponse %@", response);
+    __sync_fetch_and_add (&_timesGotResponse, 1);
+//    _timesGotResponse++;
 }
 - (void)requestDidError:(nullable NSError *)error
 {
-    NSLog(@"requestDidError %@", error);
+    //NSLog(@"requestDidError %@", error);
+    __sync_fetch_and_add (&_timesErrored, 1);
+//    _timesErrored++;
 }
 @end
 
@@ -1765,7 +1770,10 @@
     }
     // kludgy wait to allow any outstanding delegate methods to run...
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:5.0]];
+    // these succeed because we let them run...
     XCTAssertEqual(del.timesGotResponse, nRequests);
+    // these fail because we cancelled them
+    XCTAssertEqual(del.timesErrored, nRequests);
     
 }
 
@@ -1820,14 +1828,12 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         [changeTracker start];
         while(!changeTrackerStopped) {
-            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
-                                     beforeDate:[NSDate distantFuture]];
+            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
         }
     });
     
     while (!changeTrackerStopped) {
-        [[NSRunLoop currentRunLoop] runMode: NSDefaultRunLoopMode
-                                 beforeDate: [NSDate dateWithTimeIntervalSinceNow:0.1]];
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     }
     
     XCTAssertTrue(changeTrackerGotChanges);

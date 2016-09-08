@@ -118,6 +118,7 @@ static dispatch_semaphore_t g_asyncTaskMonitor;
 
 {
     NSURLSessionDataTask *nsURLSessionTask = [self.session dataTaskWithRequest:request];
+    //NSLog(@"createDataTaskWithRequest %d", nsURLSessionTask.taskIdentifier);
     [self.taskMap setObject:task forKey:[NSNumber numberWithInteger:nsURLSessionTask.taskIdentifier]];
     return nsURLSessionTask;
 }
@@ -126,6 +127,7 @@ static dispatch_semaphore_t g_asyncTaskMonitor;
 {
     // Unless we provide a queue from which to run the delegate this method will on be called in serial
     // see: https://developer.apple.com/library/ios/documentation/Foundation/Reference/NSURLSession_class/#//apple_ref/occ/clm/NSURLSession/sessionWithConfiguration:delegate:delegateQueue:
+    //NSLog(@"didReceiveData %d", dataTask.taskIdentifier);
     NSMutableData * storedData = [self.dataMap objectForKey:@(dataTask.taskIdentifier)];
     if (!storedData) {
         storedData = [NSMutableData data];
@@ -141,16 +143,19 @@ static dispatch_semaphore_t g_asyncTaskMonitor;
     NSData * data = [self.dataMap objectForKey:@(task.taskIdentifier)];
     //remove from map so it can be deallocated.
     [self.dataMap removeObjectForKey:@(task.taskIdentifier)];
-    
+    //NSLog(@"didCompleteWithError %d", task.taskIdentifier);
+
     [cdtURLSessionTask processError:error onThread:self.thread];
     [cdtURLSessionTask processData:data];
     [cdtURLSessionTask completedThread:self.thread];
     CDTLogVerbose(CDTTD_REMOTE_REQUEST_CONTEXT, @"Signalling asyncTaskMonitor");
-    dispatch_semaphore_signal(g_asyncTaskMonitor);
+    //dispatch_semaphore_signal(g_asyncTaskMonitor);
 }
 
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition))completionHandler
 {
+    //NSLog(@"didReceiveResponse %d", dataTask.taskIdentifier);
+
     CDTURLSessionTask *cdtURLSessionTask = [self getSessionTaskForId:dataTask.taskIdentifier];
     if (cdtURLSessionTask) {
         [cdtURLSessionTask processResponse:response onThread:self.thread];
@@ -171,7 +176,7 @@ static dispatch_semaphore_t g_asyncTaskMonitor;
 
 - (void) waitForFreeSlot
 {
-    dispatch_semaphore_wait(g_asyncTaskMonitor, DISPATCH_TIME_FOREVER);
+    //dispatch_semaphore_wait(g_asyncTaskMonitor, DISPATCH_TIME_FOREVER);
 }
 
 @end
