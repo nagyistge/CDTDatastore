@@ -43,8 +43,6 @@
 
 @property (nonatomic) int remainingRetries;
 
-@property (atomic) BOOL finished;
-
 @property (nonnull, nonatomic, strong) NSMutableDictionary *contextState;
 
 
@@ -103,18 +101,12 @@
     if (t) {
         [t cancel];
     }
-    self.finished = YES;
 }
 
 - (NSURLSessionTaskState)state
 {
     NSURLSessionTask *t = self.inProgressTask;
-    // Check finished as we use that to guard against returning the
-    // NSURLSessionTask's state if we're about to retry the request.
-    if (!self.finished && t.state == NSURLSessionTaskStateCompleted) {
-        NSLog(@"Inconsistent state");
-    }
-    if (self.finished && t) {
+    if (t) {
         return t.state;
     } else {
         return NSURLSessionTaskStateSuspended;  // essentially we're in this state until resumed.
@@ -125,7 +117,6 @@
 
 - (nonnull NSURLSessionDataTask *)makeRequest
 {
-    self.finished = NO;
     self.response = nil;
     self.requestError = nil;
     self.requestData = nil;
@@ -231,7 +222,6 @@
                                 withObject:self.requestData
                              waitUntilDone:NO];
         }
-        self.finished = YES;
     }
 
 }
